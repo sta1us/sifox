@@ -1,0 +1,59 @@
+version: "3.5"
+services:
+
+    server:
+        build: server/
+        container_name: cent_repo
+        ports:
+            - "80:80"
+            - "2222:22"
+        volumes:
+            - centos_repo:/var/www/repo
+        networks:
+            - rede
+        restart: always
+        healthcheck:
+            test: curl -sS http://127.0.0.1 || echo 1
+            interval: 5s
+            timeout: 10s
+            retries: 3
+        logging:
+            driver: "fluentd"
+            options:
+                tag: "repository"
+        depends_on:
+            - fluent
+
+    client:
+        build: client/
+        container_name: client
+        networks:
+            - rede
+        ports:
+            - "2223:22"
+        logging:
+            driver: "fluentd"
+            options:
+                tag: "client"
+        depends_on:
+            - server
+
+    fluent:
+        image: fluentd
+        container_name: fluent
+      networks:
+        - rede
+      volumes:
+        - logs:/fluentd/log
+      ports:
+        - "24224:24224"
+        - "24224:24224/udp"
+
+networks:
+    rede:
+        name: rede
+volumes:
+    centos_repo:
+        name: centos_repo
+    logs:
+        name: logs
