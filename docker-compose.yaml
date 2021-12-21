@@ -41,13 +41,13 @@ services:
     fluent:
         image: fluentd
         container_name: fluent
-      networks:
-        - rede
-      volumes:
-        - logs:/fluentd/log
-      ports:
-        - "24224:24224"
-        - "24224:24224/udp"
+        networks:
+            - rede
+        volumes:
+            - logs:/fluentd/log
+        ports:
+            - "24224:24224"
+            - "24224:24224/udp"
 
 networks:
     rede:
